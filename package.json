@@ -1,0 +1,28 @@
+{
+  "name": "binary-check-teamcity",
+  "version": "0.1.0",
+  "description": "A task for team city builds to identify binary files checked into a branch as part of a pull request",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelgwelch/binary-check-teamcity.git"
+  },
+  "keywords": [
+    "binary",
+    "lfs",
+    "check",
+    "teamcity",
+    "team",
+    "city",
+    "build"
+  ],
+  "author": "Michael Welch",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/michaelgwelch/binary-check-teamcity/issues"
+  },
+  "homepage": "https://github.com/michaelgwelch/binary-check-teamcity#readme"
+}
