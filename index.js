@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-/* eslint-disable no-await-in-loop */
+/* eslint-disable no-await-in-loop, no-console */
 const unirest = require('unirest');
 const parseArgs = require('minimist');
 const lfs = require('lfs-check');
@@ -84,9 +84,47 @@ async function doCheck(host, owner, repo, branch, reporter) {
 }
 
 const defaultHost = 'github.jci.com';
-const {
-  host, owner, repo, branch, reporter,
-} = parseArgs(process.argv.slice(2));
+const args = parseArgs(process.argv.slice(2));
 
-doCheck(host || defaultHost, owner, repo, branch, reporter);
+
+/* eslint-disable no-shadow */
+function validArgs(args) {
+  const mergeBranchPattern = /^\d+\/merge$/;
+  const {
+    owner, repo, branch,
+  } = args;
+
+
+  if (!branch || !owner || !repo) {
+    return false;
+  }
+
+  if (!mergeBranchPattern.test(branch)) {
+    // not a merge branch, just a regular branch. 
+    return false;
+  }
+
+  return true;
+}
+/* eslint-enable no-shardow */
+
+if (!validArgs(args)) {
+  console.log(`
+  Usage: binary-check [--host=<host>] --owner=<owner|user> 
+                       --repo=<repo> --branch=<branch>
+  
+  Notes: 
+    - branch should be in the format provided by teamcity (eg. 90/merge, 
+      1/merge, 100/merge)
+    - host defaults to github.jci.com
+    `);
+
+  process.exit(-1);
+}
+
+const {
+  host, owner, repo, branch,
+} = args;
+
+doCheck(host || defaultHost, owner, repo, branch, 'teamcity');
 
