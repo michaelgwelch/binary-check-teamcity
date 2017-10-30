@@ -1,6 +1,6 @@
 {
   "name": "binary-check-teamcity",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A task for team city builds to identify binary files checked into a branch as part of a pull request",
   "preferGlobal": true,
   "bin": {

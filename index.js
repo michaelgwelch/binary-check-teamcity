@@ -80,7 +80,7 @@ async function doCheck(host, owner, repo, branch, reporter) {
   });
 
   collector.testSuiteFinished({ name: testSuite });
-  collector.buildStatisticValue({ key: 'BinaryFileViolationCount', value: binaries.count });
+  collector.buildStatisticValue({ key: 'BinaryFileViolationCount', value: binaries.length });
 }
 
 const defaultHost = 'github.jci.com';
