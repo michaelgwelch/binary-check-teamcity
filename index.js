@@ -1,0 +1,92 @@
+#! /usr/bin/env node
+/* eslint-disable no-await-in-loop */
+const unirest = require('unirest');
+const parseArgs = require('minimist');
+const lfs = require('lfs-check');
+const _ = require('lodash');
+const TeamCityCollector = require('./teamcity-results-collector');
+const DefaultCollector = require('./default-results-collector');
+
+// curl -v -H "Authorization: token 2f1c1ac179d575159bb19ccf3f646dab1b87c951" https://github.jci.com/api/v3/repos/g4-metasys-server/evolution/pulls/70/commits
+
+// argument to get branch from team city `-- %teamcity.build.branch%` in format 99/merge
+
+// Expect to be called:
+// --owner  The org or user
+// --user    alias for owner
+// --repo   the name of the repository
+// --host   the host (defaults to github.jci.com)
+// --team-city-branch  The name of the branch used by team city to do merges (format XXX/merge).
+//                  If the branch is not in that format then we'll just do a check on HEAD of branch
+//                  Else we'll extract pr # and call GitHub api to request commits for pr.
+
+// [{"key":"Authorization","value":"Bearer 2f1c1ac179d575159bb19ccf3f646dab1b87c951"}]
+
+const apiPath = 'api/v3';
+
+async function httpGet(url, headers) {
+  return new Promise(resolve => unirest('GET', url, headers, response => resolve(response)));
+}
+
+async function commitsForPullRequest(host, owner, repo, pr) {
+  const headers = { Authorization: 'token 2f1c1ac179d575159bb19ccf3f646dab1b87c951' };
+  const url = `https://${host}/${apiPath}/repos/${owner}/${repo}/pulls/${pr}/commits`;
+
+  const response = await httpGet(url, headers);
+  if (response.error) {
+    throw new Error(response.error);
+  }
+  return _.map(response.body, 'sha');
+
+}
+
+async function checkCommits(commits) {
+  const tovisit = commits;
+  let binaries = [];
+
+  do {
+    const sha = tovisit.pop();
+
+    const errors = await lfs.checkCommit(sha);
+
+    if (errors.length > 0) {
+      binaries = binaries.concat(errors);
+    }
+  } while (tovisit.length > 0);
+
+  return binaries;
+}
+
+async function doCheck(host, owner, repo, branch, reporter) {
+  const pr = (branch.endsWith('/merge')) ? branch.split('/')[0] : undefined;
+  let binaries;
+  if (pr) {
+    binaries = await commitsForPullRequest(host, owner, repo, pr)
+      .then(commits => checkCommits(commits))
+      .catch(reason => console.log(reason));
+  } else {
+    binaries = await lfs.checkCommit(branch).catch(reason => console.log(reason));
+  }
+
+  const collector = (reporter === 'teamcity') ? new TeamCityCollector() : new DefaultCollector();
+  const testSuite = 'Binary File Violations';
+  collector.testSuiteStarted({ name: testSuite });
+  binaries.forEach((binary) => {
+    const [sha, file] = binary.split(':');
+    const testName = `${testSuite}:${binary}`;
+    collector.testStarted({ name: testName });
+    collector.testFailed({ name: testName, message: `File '${file}' in commit '${sha}' is binary. Use git lfs to track instead.` });
+    collector.testFinished({ name: testName });
+  });
+
+  collector.testSuiteFinished({ name: testSuite });
+  collector.buildStatisticValue({ key: 'BinaryFileViolationCount', value: binaries.count });
+}
+
+const defaultHost = 'github.jci.com';
+const {
+  host, owner, repo, branch, reporter,
+} = parseArgs(process.argv.slice(2));
+
+doCheck(host || defaultHost, owner, repo, branch, reporter);
+

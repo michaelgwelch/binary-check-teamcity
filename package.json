@@ -2,7 +2,10 @@
   "name": "binary-check-teamcity",
   "version": "0.1.0",
   "description": "A task for team city builds to identify binary files checked into a branch as part of a pull request",
-  "main": "index.js",
+  "preferGlobal": true,
+  "bin": {
+    "binary-check": "./index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,5 +27,16 @@
   "bugs": {
     "url": "https://github.com/michaelgwelch/binary-check-teamcity/issues"
   },
-  "homepage": "https://github.com/michaelgwelch/binary-check-teamcity#readme"
+  "homepage": "https://github.com/michaelgwelch/binary-check-teamcity#readme",
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
+  },
+  "dependencies": {
+    "lfs-check": "^0.2.1",
+    "lodash": "^4.17.4",
+    "minimist": "^1.2.0",
+    "teamcity-service-messages": "^0.1.8",
+    "unirest": "^0.5.1"
+  }
 }
