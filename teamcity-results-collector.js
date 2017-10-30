@@ -23,9 +23,9 @@ class TeamCityCollector {
   inspectionType(inspectionType) {
     tsm.inspectionType(inspectionType);
   }
-  inspection(typeId, message, file, line, additionalAttribute) {
+  inspection(typeId, message, file, line, severity) {
     tsm.inspection({
-      typeId, message, file, line, 'additional attribute': additionalAttribute,
+      typeId, message, file, line, SEVERITY: severity,
     });
   }
   buildProblem(description, identity) {
