@@ -99,11 +99,6 @@ function validArgs(args) {
     return false;
   }
 
-  if (!mergeBranchPattern.test(branch)) {
-    // not a merge branch, just a regular branch. 
-    return false;
-  }
-
   return true;
 }
 /* eslint-enable no-shardow */
