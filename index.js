@@ -80,15 +80,10 @@ async function doCheck(host, owner, repo, branch, reporter) {
 
     binaries.forEach((binary) => {
       const [sha, file] = binary.split(':');
-      collector.inspection({
-        typeId: 'FILE001',
-        message: `Binary file '${file}' detected in commit '${sha}'`,
-        file: binary,
-        additionalAttribute: 'ERROR',
-      });
+      collector.inspection('FILE001', `Binary file '${file}' detected in commit '${sha}'`, binary, 'ERROR');
     });
 
-    collector.buildProblem({});
+    collector.buildProblem('Binary files detected', 'FILE001');
   }
 }
 
