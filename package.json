@@ -1,6 +1,6 @@
 {
   "name": "binary-check-teamcity",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A task for team city builds to identify binary files checked into a branch as part of a pull request",
   "preferGlobal": true,
   "bin": {
@@ -36,7 +36,7 @@
     "lfs-check": "^0.2.1",
     "lodash": "^4.17.4",
     "minimist": "^1.2.0",
-    "teamcity-service-messages": "^0.1.8",
+    "teamcity-service-messages": "git+https://github.com/michaelgwelch/teamcity-service-messages.git",
     "unirest": "^0.5.1"
   }
 }

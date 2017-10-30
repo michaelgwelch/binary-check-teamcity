@@ -8,6 +8,11 @@ class DefaultResultsCollector {
   testSuiteStarted() {}
   testSuiteFinished() {}
   buildStatisticValue() {}
+  inspectionType() {}
+  inspection(inspection) {
+    console.log(JSON.stringify(inspection, null, 2));
+  }
+  buildProblem() {}
 }
 
 module.exports = DefaultResultsCollector;

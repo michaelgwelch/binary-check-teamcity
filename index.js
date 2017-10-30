@@ -7,6 +7,13 @@ const _ = require('lodash');
 const TeamCityCollector = require('./teamcity-results-collector');
 const DefaultCollector = require('./default-results-collector');
 
+const binaryFileInspection = {
+  id: 'FILE001',
+  name: 'no-binary-files',
+  category: 'File metadata checks',
+  description: 'Reports binary files that were detected in a commit. Binary files should be tracked using git lfs rather than being checked directly into a repo.',
+};
+
 // curl -v -H "Authorization: token 2f1c1ac179d575159bb19ccf3f646dab1b87c951" https://github.jci.com/api/v3/repos/g4-metasys-server/evolution/pulls/70/commits
 
 // argument to get branch from team city `-- %teamcity.build.branch%` in format 99/merge
@@ -37,7 +44,6 @@ async function commitsForPullRequest(host, owner, repo, pr) {
     throw new Error(response.error);
   }
   return _.map(response.body, 'sha');
-
 }
 
 async function checkCommits(commits) {
@@ -68,19 +74,22 @@ async function doCheck(host, owner, repo, branch, reporter) {
     binaries = await lfs.checkCommit(branch).catch(reason => console.log(reason));
   }
 
-  const collector = (reporter === 'teamcity') ? new TeamCityCollector() : new DefaultCollector();
-  const testSuite = 'Binary File Violations';
-  collector.testSuiteStarted({ name: testSuite });
-  binaries.forEach((binary) => {
-    const [sha, file] = binary.split(':');
-    const testName = `${testSuite}:${binary}`;
-    collector.testStarted({ name: testName });
-    collector.testFailed({ name: testName, message: `File '${file}' in commit '${sha}' is binary. Use git lfs to track instead.` });
-    collector.testFinished({ name: testName });
-  });
+  if (binaries.length > 0) {
+    const collector = (reporter === 'teamcity') ? new TeamCityCollector() : new DefaultCollector();
+    collector.inspectionType(binaryFileInspection);
 
-  collector.testSuiteFinished({ name: testSuite });
-  collector.buildStatisticValue({ key: 'BinaryFileViolationCount', value: binaries.length });
+    binaries.forEach((binary) => {
+      const [sha, file] = binary.split(':');
+      collector.inspection({
+        typeId: 'FILE001',
+        message: `Binary file '${file}' detected in commit '${sha}'`,
+        file: binary,
+        additionalAttribute: 'ERROR',
+      });
+    });
+
+    collector.buildProblem({});
+  }
 }
 
 const defaultHost = 'github.jci.com';
@@ -89,7 +98,6 @@ const args = parseArgs(process.argv.slice(2));
 
 /* eslint-disable no-shadow */
 function validArgs(args) {
-  const mergeBranchPattern = /^\d+\/merge$/;
   const {
     owner, repo, branch,
   } = args;

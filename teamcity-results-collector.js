@@ -20,6 +20,17 @@ class TeamCityCollector {
   buildStatisticValue(sample) {
     tsm.buildStatisticValue(sample);
   }
+  inspectionType(inspectionType) {
+    tsm.inspectionType(inspectionType);
+  }
+  inspection(typeId, message, file, line, additionalAttribute) {
+    tsm.inspection({
+      typeId, message, file, line, 'additional attribute': additionalAttribute,
+    });
+  }
+  buildProblem(description, identity) {
+    tsm.buildProblem({ description, identity });
+  }
 }
 
 module.exports = TeamCityCollector;
