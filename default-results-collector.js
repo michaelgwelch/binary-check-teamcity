@@ -13,6 +13,7 @@ class DefaultResultsCollector {
     console.log(JSON.stringify(inspection, null, 2));
   }
   buildProblem() {}
+  setParameter() {}
 }
 
 module.exports = DefaultResultsCollector;

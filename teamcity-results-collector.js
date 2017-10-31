@@ -31,6 +31,9 @@ class TeamCityCollector {
   buildProblem(description, identity) {
     tsm.buildProblem({ description, identity });
   }
+  setParameter(parameter) {
+    tsm.setParameter(parameter);
+  }
 }
 
 module.exports = TeamCityCollector;
