@@ -83,7 +83,7 @@ async function doCheck(host, owner, repo, branch, reporter) {
       collector.inspection('FILE001', `Binary file '${file}' detected in commit '${sha}'`, file, undefined, 'ERROR');
     });
 
-    collector.setParameter({ key: 'binary-file-errors', value: true });
+    collector.setParameter({ name: 'binary-file-errors', value: true });
   }
 }
 
