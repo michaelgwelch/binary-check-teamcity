@@ -14,7 +14,6 @@ const binaryFileInspection = {
   description: 'Reports binary files that were detected in a commit. Binary files should be tracked using git lfs rather than being checked directly into a repo.',
 };
 
-// curl -v -H "Authorization: token 2f1c1ac179d575159bb19ccf3f646dab1b87c951" https://github.jci.com/api/v3/repos/g4-metasys-server/evolution/pulls/70/commits
 
 // argument to get branch from team city `-- %teamcity.build.branch%` in format 99/merge
 
@@ -27,7 +26,6 @@ const binaryFileInspection = {
 //                  If the branch is not in that format then we'll just do a check on HEAD of branch
 //                  Else we'll extract pr # and call GitHub api to request commits for pr.
 
-// [{"key":"Authorization","value":"Bearer 2f1c1ac179d575159bb19ccf3f646dab1b87c951"}]
 
 const apiPath = 'api/v3';
 
@@ -36,7 +34,6 @@ async function httpGet(url, headers) {
 }
 
 async function commitsForPullRequest(host, owner, repo, pr) {
-  const headers = { Authorization: 'token 2f1c1ac179d575159bb19ccf3f646dab1b87c951' };
   const url = `https://${host}/${apiPath}/repos/${owner}/${repo}/pulls/${pr}/commits`;
 
   const response = await httpGet(url, headers);
